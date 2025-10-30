@@ -19,6 +19,49 @@ export default function WalletView() {
     { name: 'Kroger', logo: 'KROGER' },
   ];
 
+  const productsData = {
+    active: [
+      {
+        id: 1,
+        title: '$50 Nutrition Essentials',
+        description: 'This offer is good towards the purchase of Nutrition Essentials, up to $50 value.',
+        balance: 50,
+        expires: 'Dec 31, 2025',
+        icon: 'image'
+      },
+      {
+        id: 2,
+        title: '$100 Grocery Support',
+        description: 'This offer is good towards the purchase of groceries and essential household items, up to $100 value.',
+        balance: 100,
+        expires: 'Mar 15, 2026',
+        icon: 'cart'
+      }
+    ],
+    expired: [
+      {
+        id: 3,
+        title: '$25 Health & Wellness',
+        description: 'This offer was good towards health and wellness products.',
+        balance: 0,
+        expires: 'Sep 30, 2024',
+        icon: 'image'
+      }
+    ],
+    future: [
+      {
+        id: 4,
+        title: '$75 Holiday Bonus',
+        description: 'This offer will be available for holiday shopping starting November 2025.',
+        balance: 75,
+        expires: 'Starts: Nov 1, 2025',
+        icon: 'cart'
+      }
+    ]
+  };
+
+  const currentProducts = productsData[productFilter];
+
   const handleStoreSelect = (store: string) => {
     setSelectedStore(store);
     setShowStoreDropdown(false);
@@ -87,7 +130,7 @@ export default function WalletView() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-gray-900">Products</h2>
-              <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">2</span>
+              <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">{currentProducts.length}</span>
             </div>
             <div className="flex items-center gap-1 bg-gray-200 rounded-full p-1">
               <button
@@ -117,71 +160,46 @@ export default function WalletView() {
             </div>
           </div>
 
-          {/* Offer Card */}
-          <div className="bg-white rounded-xl overflow-hidden shadow-md">
-            {/* Balance Bar - Now at top */}
-            <div className="bg-green-50 border-t-2 border-b-2 border-green-500 px-4 py-2 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-green-700">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                </svg>
-                <span className="text-sm font-semibold">Available Balance</span>
-              </div>
-              <span className="text-green-700 font-bold text-lg">$50.00</span>
-            </div>
-
-            <div className="p-4 flex gap-3">
-              {/* Offer Image - Smaller, Left-aligned */}
-              <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+          {/* Product Cards */}
+          {currentProducts.map((product, index) => (
+            <div key={product.id} className={`bg-white rounded-xl overflow-hidden shadow-md ${index > 0 ? 'mt-3' : ''}`}>
+              {/* Balance Bar */}
+              <div className={`${productFilter === 'expired' ? 'bg-red-50 border-red-500' : productFilter === 'future' ? 'bg-blue-50 border-blue-500' : 'bg-green-50 border-green-500'} border-t-2 border-b-2 px-4 py-2 flex items-center justify-between`}>
+                <div className={`flex items-center gap-2 ${productFilter === 'expired' ? 'text-red-700' : productFilter === 'future' ? 'text-blue-700' : 'text-green-700'}`}>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-semibold">{productFilter === 'expired' ? 'Expired Balance' : productFilter === 'future' ? 'Scheduled Balance' : 'Available Balance'}</span>
+                </div>
+                <span className={`${productFilter === 'expired' ? 'text-red-700' : productFilter === 'future' ? 'text-blue-700' : 'text-green-700'} font-bold text-lg`}>${product.balance.toFixed(2)}</span>
               </div>
 
-              {/* Offer Details */}
-              <div className="flex-1">
-                <h3 className="text-base font-bold text-gray-900 mb-0.5">$50 Nutrition Essentials</h3>
-                <p className="text-orange-600 text-xs font-medium mb-1">Expires: Dec 31, 2025</p>
-                <p className="text-gray-600 text-xs leading-relaxed">
-                  This offer is good towards the purchase of Nutrition Essentials, up to $50 value.
-                </p>
-              </div>
-            </div>
-          </div>
+              <div className="p-4 flex gap-3">
+                {/* Product Image */}
+                <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {product.icon === 'cart' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    )}
+                  </svg>
+                </div>
 
-          {/* Offer Card 2 - Grocery Support */}
-          <div className="bg-white rounded-xl overflow-hidden shadow-md mt-3">
-            {/* Balance Bar - Now at top */}
-            <div className="bg-green-50 border-t-2 border-b-2 border-green-500 px-4 py-2 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-green-700">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                </svg>
-                <span className="text-sm font-semibold">Available Balance</span>
-              </div>
-              <span className="text-green-700 font-bold text-lg">$100.00</span>
-            </div>
-
-            <div className="p-4 flex gap-3">
-              {/* Offer Image - Smaller, Left-aligned */}
-              <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-
-              {/* Offer Details */}
-              <div className="flex-1">
-                <h3 className="text-base font-bold text-gray-900 mb-0.5">$100 Grocery Support</h3>
-                <p className="text-orange-600 text-xs font-medium mb-1">Expires: Mar 15, 2026</p>
-                <p className="text-gray-600 text-xs leading-relaxed">
-                  This offer is good towards the purchase of groceries and essential household items, up to $100 value.
-                </p>
+                {/* Product Details */}
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-gray-900 mb-0.5">{product.title}</h3>
+                  <p className={`text-xs font-medium mb-1 ${productFilter === 'expired' ? 'text-red-600' : productFilter === 'future' ? 'text-blue-600' : 'text-orange-600'}`}>
+                    {productFilter === 'expired' ? 'Expired: ' : ''}{product.expires}
+                  </p>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
         {/* Bottom Navigation */}
