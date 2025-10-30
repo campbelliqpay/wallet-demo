@@ -5,6 +5,7 @@ import Image from 'next/image';
 import careSourceLogo from '@/images/caresource.png';
 import CheckoutInstructions from './CheckoutInstructions';
 import QRScanner from './QRScanner';
+import ReportMissingProduct from './ReportMissingProduct';
 
 interface WalletViewProps {
   onStepChange?: (step: string) => void;
@@ -18,6 +19,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
   const [authError, setAuthError] = useState('');
   const [showCheckout, setShowCheckout] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [showStoreDropdown, setShowStoreDropdown] = useState(false);
   const [selectedStore, setSelectedStore] = useState('');
   const [productFilter, setProductFilter] = useState<'active' | 'expired' | 'future'>('active');
@@ -67,6 +69,11 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
       return;
     }
 
+    if (showReportModal) {
+      onStepChange('Report Missing Product');
+      return;
+    }
+
     if (currentView === 'scanner') {
       onStepChange('Scanner');
       return;
@@ -103,7 +110,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
 
     // Fallback
     onStepChange('My Cards');
-  }, [onStepChange, isAuthenticated, currentView, isCardDetailView, showInstructions, showScanner, selectedAction]);
+  }, [onStepChange, isAuthenticated, currentView, isCardDetailView, showInstructions, showScanner, showReportModal, selectedAction]);
 
   const stores = [
     { name: 'Acme Markets', logo: 'ACME' },
@@ -1165,9 +1172,9 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
               {/* Report Missing Product Button */}
               <button
                 onClick={() => {
-                  onStepChange && onStepChange('Report Missing Product');
+                  setShowReportModal(true);
                 }}
-                className="w-full bg-red-600 hover:bg-red-700 text-white rounded-xl py-4 px-4 flex items-center justify-center gap-3 transition-colors shadow-md"
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl py-4 px-4 flex items-center justify-center gap-3 transition-colors shadow-md"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -1711,6 +1718,12 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
             </div>
           </>
         )}
+
+        {/* Report Missing Product Modal */}
+        <ReportMissingProduct
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+        />
       </div>
     </>
   );
