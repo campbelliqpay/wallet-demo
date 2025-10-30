@@ -12,6 +12,7 @@ interface WalletViewProps {
 
 export default function WalletView({ onStepChange }: WalletViewProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [contactInfo, setContactInfo] = useState('');
   const [dobInput, setDobInput] = useState({ month: '', day: '', year: '' });
   const [rememberMe, setRememberMe] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -284,6 +285,21 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
   };
 
   const handleAuth = () => {
+    // Validate contact info
+    if (!contactInfo.trim()) {
+      setAuthError('Please enter your phone number or email address');
+      return;
+    }
+
+    // Basic validation for email or phone format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+
+    if (!emailRegex.test(contactInfo) && !phoneRegex.test(contactInfo.replace(/\D/g, ''))) {
+      setAuthError('Please enter a valid email address or 10-digit phone number');
+      return;
+    }
+
     // For demo purposes, accepting any valid date format
     // In production, this would verify against actual DOB
     const { month, day, year } = dobInput;
@@ -346,15 +362,31 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
 
           {/* Auth Card */}
           <div className="bg-white rounded-2xl shadow-2xl p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Enter Date of Birth</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-2">Verify Your Identity</h2>
             <p className="text-sm text-gray-600 mb-6">
-              Please enter your date of birth to continue
+              Please enter your contact information and date of birth to continue
             </p>
 
+            {/* Contact Info Input */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Phone Number or Email Address
+              </label>
+              <input
+                type="text"
+                placeholder="(555) 123-4567 or email@example.com"
+                value={contactInfo}
+                onChange={(e) => setContactInfo(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-base"
+              />
+            </div>
+
             {/* DOB Input Fields */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Month</label>
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-700 mb-2">Date of Birth</label>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Month</label>
                 <input
                   type="number"
                   placeholder="MM"
@@ -366,7 +398,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Day</label>
+                <label className="block text-xs text-gray-500 mb-1">Day</label>
                 <input
                   type="number"
                   placeholder="DD"
@@ -378,7 +410,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Year</label>
+                <label className="block text-xs text-gray-500 mb-1">Year</label>
                 <input
                   type="number"
                   placeholder="YYYY"
@@ -389,6 +421,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                   className="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg font-semibold"
                 />
               </div>
+            </div>
             </div>
 
             {/* Error Message */}
