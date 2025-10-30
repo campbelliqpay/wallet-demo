@@ -1,13 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ReportMissingProduct from './ReportMissingProduct';
 
 interface QRScannerProps {
   isOpen: boolean;
   onClose: () => void;
+  onStepChange?: (step: string) => void;
 }
 
-export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
+export default function QRScanner({ isOpen, onClose, onStepChange }: QRScannerProps) {
+  const [showReportModal, setShowReportModal] = useState(false);
+
+  // Update step based on modal state
+  useEffect(() => {
+    if (!isOpen || !onStepChange) return;
+
+    if (showReportModal) {
+      onStepChange('Report Missing Product');
+    } else {
+      onStepChange('Scanner');
+    }
+  }, [isOpen, showReportModal, onStepChange]);
+
   if (!isOpen) return null;
 
   return (
@@ -56,8 +71,14 @@ export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
         <p className="text-sm text-gray-400">The scanner will automatically detect the code</p>
       </div>
 
-      {/* Bottom Action */}
-      <div className="bg-gray-900/90 p-4">
+      {/* Bottom Actions */}
+      <div className="bg-gray-900/90 p-4 space-y-3">
+        <button
+          onClick={() => setShowReportModal(true)}
+          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition"
+        >
+          Report Missing Product
+        </button>
         <button
           onClick={onClose}
           className="w-full bg-white text-gray-900 py-3 rounded-lg font-semibold"
@@ -65,6 +86,12 @@ export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
           Cancel
         </button>
       </div>
+
+      {/* Report Missing Product Modal */}
+      <ReportMissingProduct
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+      />
     </div>
   );
 }

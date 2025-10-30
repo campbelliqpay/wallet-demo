@@ -1432,6 +1432,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
             <QRScanner
               isOpen={showScanner}
               onClose={() => setShowScanner(false)}
+              onStepChange={onStepChange}
             />
           </div>
         )}
