@@ -9,7 +9,7 @@ export default function WalletView() {
   const [showScanner, setShowScanner] = useState(false);
   const [showStoreDropdown, setShowStoreDropdown] = useState(false);
   const [selectedStore, setSelectedStore] = useState('');
-  const [showExpired, setShowExpired] = useState(false);
+  const [productFilter, setProductFilter] = useState<'active' | 'expired' | 'future'>('active');
   const [currentView, setCurrentView] = useState<'offers' | 'program' | 'help'>('offers');
 
   const stores = [
@@ -89,19 +89,30 @@ export default function WalletView() {
               <h2 className="text-xl font-bold text-gray-900">Products</h2>
               <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">2</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Show Expired</span>
+            <div className="flex items-center gap-1 bg-gray-200 rounded-full p-1">
               <button
-                onClick={() => setShowExpired(!showExpired)}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  showExpired ? 'bg-blue-500' : 'bg-gray-300'
+                onClick={() => setProductFilter('active')}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
+                  productFilter === 'active' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <div
-                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    showExpired ? 'translate-x-6' : 'translate-x-0'
-                  }`}
-                />
+                Active
+              </button>
+              <button
+                onClick={() => setProductFilter('expired')}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
+                  productFilter === 'expired' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Expired
+              </button>
+              <button
+                onClick={() => setProductFilter('future')}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
+                  productFilter === 'future' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Future
               </button>
             </div>
           </div>
