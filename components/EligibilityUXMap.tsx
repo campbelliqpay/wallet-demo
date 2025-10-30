@@ -1,8 +1,6 @@
-'use client';
-
 import React from 'react';
 
-interface UXMapProps {
+interface EligibilityUXMapProps {
   currentStep: string;
 }
 
@@ -13,49 +11,37 @@ type TreeNode = {
 };
 
 const TREE: TreeNode = {
-  label: 'Loading',
-  key: 'Loading',
+  label: 'Welcome',
+  key: 'Welcome',
   children: [
     {
-      label: 'Auth',
-      key: 'Auth',
+      label: 'Actions',
+      key: 'Actions',
       children: [
         {
-          label: 'My Cards',
-          key: 'My Cards',
+          label: 'Immunizations',
+          key: 'Immunizations',
           children: [
-            { label: 'OTC Card', key: 'OTC Card' },
-            { label: 'Uber Card', key: 'Uber Card' },
-            { label: 'Discover Card', key: 'Discover Card' },
-            { label: 'Walmart Card', key: 'Walmart Card' }
+            { label: 'Confirm Eligibility', key: 'Confirm Eligibility' },
+            { label: 'Immunization Details', key: 'Immunization Details' },
+            { label: 'Review & Submit', key: 'Review & Submit' }
           ]
         },
-        {
-          label: 'My Actions',
-          key: 'My Actions',
-          children: [{ label: 'Action Detail', key: 'Action Detail' }]
-        },
-        { label: 'My Program', key: 'My Program' },
-        { label: 'Help', key: 'Help' },
-        {
-          label: 'Scanner',
-          key: 'Scanner',
-          children: [
-            { label: 'Launch Scanner', key: 'Launch Scanner' },
-            { label: 'Report Missing Product', key: 'Report Missing Product' }
-          ]
-        }
+        { label: 'Annual Physical', key: 'Annual Physical' },
+        { label: 'Dental Cleaning', key: 'Dental Cleaning' },
+        { label: 'Vision Exam', key: 'Vision Exam' }
       ]
     }
   ]
 };
 
 function normalizeStep(step: string): string {
-  if (step.startsWith('Action Detail')) return 'Action Detail';
+  // Collapses sub-steps with prefixes if needed
+  if (step.startsWith('Immunizations:')) return step.replace('Immunizations: ', '');
   return step;
 }
 
-export default function UXMap({ currentStep }: UXMapProps) {
+export default function EligibilityUXMap({ currentStep }: EligibilityUXMapProps) {
   const active = normalizeStep(currentStep);
 
   const renderNode = (node: TreeNode, depth = 0) => {
@@ -93,7 +79,7 @@ export default function UXMap({ currentStep }: UXMapProps) {
     <div className="w-[400px] mt-4 md:mt-0 md:sticky md:top-8">
       <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-gray-900">Demo UX Map</h3>
+          <h3 className="text-sm font-bold text-gray-900">Eligibility UX Map</h3>
           <span className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">{currentStep}</span>
         </div>
 

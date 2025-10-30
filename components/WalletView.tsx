@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import careSourceLogo from '@/images/caresource.png';
 import CheckoutInstructions from './CheckoutInstructions';
 import QRScanner from './QRScanner';
 
@@ -19,12 +20,13 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
   const [showStoreDropdown, setShowStoreDropdown] = useState(false);
   const [selectedStore, setSelectedStore] = useState('');
   const [productFilter, setProductFilter] = useState<'active' | 'expired' | 'future'>('active');
-  const [actionFilter, setActionFilter] = useState<'available' | 'completed'>('available');
+  const [actionFilter, setActionFilter] = useState<'rewards' | 'visits' | 'completed'>('rewards');
   const [currentView, setCurrentView] = useState<'cards' | 'offers' | 'program' | 'help' | 'scanner'>('cards');
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [isCardDetailView, setIsCardDetailView] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Check for stored authentication on mount
   useEffect(() => {
@@ -82,8 +84,12 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
       return;
     }
 
-    // Cards: show specific card
+    // Cards: list view -> My Cards; detail view -> specific card
     if (currentView === 'cards') {
+      if (!isCardDetailView) {
+        onStepChange('My Cards');
+        return;
+      }
       const cardStepMap: Record<number, string> = {
         1: 'OTC Card',
         2: 'Uber Card',
@@ -110,15 +116,15 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
       id: 1,
       holderName: 'Abby Selbeck',
       cardNumber: '6103 8040 0273 7944 587',
-      programName: 'Employee Food Program',
-      gradient: 'from-blue-600 via-blue-500 to-cyan-400',
+      programName: 'Diaper Reward',
+      gradient: 'from-purple-500 via-violet-400 to-purple-300',
       logo: '/images/otc badge.png'
     },
     {
       id: 2,
       holderName: 'Abby Selbeck',
       cardNumber: '5421 9876 5432 1098 234',
-      programName: 'Uber Rides',
+      programName: 'Transportation Assistance',
       gradient: 'from-gray-900 via-gray-800 to-black',
       logo: '/images/uber logo.svg'
     },
@@ -134,8 +140,8 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
       id: 4,
       holderName: 'Abby Selbeck',
       cardNumber: '6011 2233 4455 6677 889',
-      programName: 'Walmart Benefits',
-      gradient: 'from-blue-500 via-blue-400 to-yellow-400',
+      programName: 'Grocery Card',
+      gradient: 'from-purple-700 via-violet-600 to-purple-500',
       logo: '/images/walmart logo.png'
     }
   ];
@@ -261,7 +267,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
   };
 
   const currentCard = cards[selectedCardIndex];
-  const currentProducts = allProductsData[currentCard.id][productFilter];
+  const currentProducts = (allProductsData as any)[currentCard.id][productFilter];
 
   const handleStoreSelect = (store: string) => {
     setSelectedStore(store);
@@ -444,8 +450,8 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
         {/* Header */}
         <div className="bg-white border-b border-gray-100 px-6 pt-12 pb-4 sticky top-0 z-10">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-              iQpay
+            <div className="flex items-center">
+              <Image src={careSourceLogo} alt="CareSource" width={96} height={96} />
             </div>
             <button className="flex items-center gap-2 px-3 py-1.5 border-2 border-gray-300 rounded-full text-gray-700">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -468,7 +474,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                 }}
                 className={`flex-1 py-2.5 rounded-lg font-semibold transition-colors ${
                   currentView === 'cards'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-violet-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -478,7 +484,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                 onClick={() => setCurrentView('offers')}
                 className={`flex-1 py-2.5 rounded-lg font-semibold transition-colors ${
                   currentView === 'offers'
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-violet-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -491,16 +497,24 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
         {currentView === 'cards' && !isCardDetailView ? (
           /* Card List View */
           <>
-            <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto">
+            <div className="flex-1 px-6 py-4 overflow-y-auto">
               {cards.map((card, index) => (
                 <div
                   key={card.id}
                   onClick={() => handleCardClick(index)}
-                  className={`bg-gradient-to-br ${card.gradient} rounded-2xl p-5 shadow-xl cursor-pointer transition-all duration-300 hover:scale-102`}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className={`bg-gradient-to-br ${card.gradient} rounded-2xl shadow-xl cursor-pointer transition-transform duration-300 hover:-translate-y-1 relative`}
+                  style={{
+                    marginTop: index === 0 ? 0 : -80,
+                    zIndex: (index + 1) + (hoveredIndex === index ? 100 : 0),
+                    padding: '20px',
+                    height: '200px' // standard card size
+                  }}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="text-white text-lg font-bold">iQpay</div>
-                    {card.logo && (
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="text-white text-sm font-semibold opacity-95">{card.programName}</div>
+                    {card.logo ? (
                       <div className="bg-white rounded-lg p-2 flex items-center justify-center" style={{ width: '60px', height: '40px' }}>
                         <Image
                           src={card.logo}
@@ -510,22 +524,20 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                           style={{ objectFit: 'contain' }}
                         />
                       </div>
-                    )}
+                    ) : null}
                   </div>
-                  <div className="text-white text-sm opacity-90 mb-2">{card.programName}</div>
-                  <div className="text-white text-base font-mono tracking-wider mb-5">
+                  <div className="text-white text-base font-semibold mb-1">{card.holderName}</div>
+                  <div className="text-white text-base font-mono tracking-wider mb-5 drop-shadow-md">
                     {card.cardNumber}
                   </div>
-                  <div className="flex items-end justify-between">
-                    <div className="text-white text-base font-semibold">{card.holderName}</div>
-                    {!card.logo && (
-                      <div className="bg-[#e87722] text-white px-3 py-1 rounded-md">
-                        <span className="text-xs font-semibold">Network</span>
-                      </div>
-                    )}
-                  </div>
+                  {!card.logo && (
+                    <div className="bg-[#e87722] text-white px-3 py-1 rounded-md inline-block">
+                      <span className="text-xs font-semibold">Network</span>
+                    </div>
+                  )}
                 </div>
               ))}
+              <div className="h-24" />
             </div>
           </>
         ) : currentView === 'cards' && isCardDetailView ? (
@@ -547,9 +559,9 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
             {/* Selected Card */}
             <div className="px-6 py-4">
               <div className={`bg-gradient-to-br ${currentCard.gradient} rounded-2xl p-5 shadow-xl`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-white text-lg font-bold">iQpay</div>
-                  {currentCard.logo && (
+                <div className="flex items-start justify-between mb-3">
+                  <div className="text-white text-sm font-semibold opacity-95">{currentCard.programName}</div>
+                  {currentCard.logo ? (
                     <div className="bg-white rounded-lg p-2 flex items-center justify-center" style={{ width: '60px', height: '40px' }}>
                       <Image
                         src={currentCard.logo}
@@ -559,20 +571,17 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                         style={{ objectFit: 'contain' }}
                       />
                     </div>
-                  )}
+                  ) : null}
                 </div>
-                <div className="text-white text-sm opacity-90 mb-2">{currentCard.programName}</div>
-                <div className="text-white text-base font-mono tracking-wider mb-5">
+                <div className="text-white text-base font-semibold mt-1 mb-1">{currentCard.holderName}</div>
+                <div className="text-white text-base font-mono tracking-wider mt-1 mb-5">
                   {currentCard.cardNumber}
                 </div>
-                <div className="flex items-end justify-between">
-                  <div className="text-white text-base font-semibold">{currentCard.holderName}</div>
-                  {!currentCard.logo && (
-                    <div className="bg-[#e87722] text-white px-3 py-1 rounded-md">
-                      <span className="text-xs font-semibold">Network</span>
-                    </div>
-                  )}
-                </div>
+                {!currentCard.logo && (
+                  <div className="bg-[#e87722] text-white px-3 py-1 rounded-md inline-block">
+                    <span className="text-xs font-semibold">Network</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -699,7 +708,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                 </div>
 
                 {/* Product Cards */}
-                {currentProducts.map((product, index) => (
+                {currentProducts.map((product: any, index: number) => (
                   <div key={product.id} className={`bg-white rounded-xl overflow-hidden shadow-md ${index > 0 ? 'mt-3' : ''}`}>
                     {/* Balance Bar */}
                     <div className={`${productFilter === 'expired' ? 'bg-red-50 border-red-500' : productFilter === 'future' ? 'bg-blue-50 border-blue-500' : 'bg-green-50 border-green-500'} border-t-2 border-b-2 px-4 py-2 flex items-center justify-between`}>
@@ -754,13 +763,13 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                       <span className="text-sm font-semibold">Available Balance</span>
                     </div>
                     <span className="text-green-700 font-bold text-lg">
-                      ${currentProducts.reduce((sum, product) => sum + product.balance, 0).toFixed(2)}
+                      ${currentProducts.reduce((sum: number, product: any) => sum + product.balance, 0).toFixed(2)}
                     </span>
                   </div>
 
                   <div className="p-4">
                     <h3 className="text-base font-bold text-gray-900 mb-1">
-                      {currentCard.id === 2 ? 'Uber Benefits' : currentCard.id === 3 ? 'Rent & Utilities Support' : 'Walmart Shopping'}
+                      {currentCard.id === 2 ? 'Uber Benefits' : currentCard.id === 3 ? 'Rent & Utilities Support' : 'Grocery Card'}
                     </h3>
                     <p className="text-xs text-orange-600 font-medium mb-2">
                       Expires: Dec 31, 2025
@@ -770,7 +779,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
                         ? 'This benefit covers Uber and Uber Eats rides for commuting and meal delivery.'
                         : currentCard.id === 3
                         ? 'This benefit covers monthly rent payments and utility bills including electric, water, and gas.'
-                        : 'This benefit covers purchases at Walmart stores and Walmart.com for everyday essentials.'}
+                        : 'This benefit covers purchases at participating grocery retailers for everyday essentials.'}
                     </p>
                   </div>
                 </div>
@@ -780,21 +789,28 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
         ) : currentView === 'offers' ? (
           /* My Actions Page */
           <div className="flex-1 px-6 py-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">My Actions</h2>
-              <div className="flex items-center gap-1 bg-gray-200 rounded-full p-1">
+            <div className="mb-4">
+              <div className="flex bg-purple-100 rounded-full p-1 w-full">
                 <button
-                  onClick={() => setActionFilter('available')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
-                    actionFilter === 'available' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:text-gray-900'
+                  onClick={() => setActionFilter('rewards')}
+                  className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-colors ${
+                    actionFilter === 'rewards' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  Available
+                  Immediate Rewards
+                </button>
+                <button
+                  onClick={() => setActionFilter('visits')}
+                  className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-colors ${
+                    actionFilter === 'visits' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Health Visits
                 </button>
                 <button
                   onClick={() => setActionFilter('completed')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-full transition-colors ${
-                    actionFilter === 'completed' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:text-gray-900'
+                  className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-colors ${
+                    actionFilter === 'completed' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   Completed
@@ -802,95 +818,124 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
               </div>
             </div>
             <p className="text-gray-600 text-sm mb-6">
-              {actionFilter === 'available'
-                ? 'Complete these health actions to earn rewards'
-                : 'Actions you have already completed'}
+              {actionFilter === 'completed' ? 'Actions you have already completed' : 'Complete these health actions to earn rewards'}
             </p>
 
             {/* Action Items */}
-            <div className="space-y-4">{actionFilter === 'available' ? (
+            <div className="space-y-4">{actionFilter !== 'completed' ? (
               <>
-              {/* Available Actions */}
-              {/* Annual Health Risk Assessment */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-orange-400 transition-colors">
+              {/* Rewards tab */}
+              {actionFilter === 'rewards' && (
+              <>
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors">
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        Annual Health Risk Assessment
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Complete your yearly health assessment to identify health risks and earn rewards
-                      </p>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Report flu and COVID vaccines</h3>
+                      <p className="text-sm text-gray-600">Report an eligible vaccine to earn your incentive.</p>
                     </div>
                     <div className="ml-3 flex-shrink-0">
-                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
-                        $20
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedAction('health-assessment')}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors"
-                  >
-                    Start Assessment
-                  </button>
-                </div>
-              </div>
-
-              {/* Schedule with PCP */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-orange-400 transition-colors">
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        Schedule with your PCP
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Book and complete an annual checkup with your primary care physician
-                      </p>
-                    </div>
-                    <div className="ml-3 flex-shrink-0">
-                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
-                        $50
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedAction('pcp-appointment')}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors"
-                  >
-                    Schedule Appointment
-                  </button>
-                </div>
-              </div>
-
-              {/* Childhood Immunizations */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-orange-400 transition-colors">
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        Get Childhood Immunizations
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Keep your children up to date with recommended vaccinations
-                      </p>
-                    </div>
-                    <div className="ml-3 flex-shrink-0">
-                      <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">
-                        $10 Diapers
-                      </div>
+                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">$15 towards groceries</div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedAction('immunizations')}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors"
+                    className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-lg transition-colors"
                   >
-                    View Requirements
+                    Report Immunization
                   </button>
                 </div>
               </div>
+              {/* Report Pregnancy */}
+
+              {/* Report Pregnancy */}
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Report pregnancy</h3>
+                      <p className="text-sm text-gray-600">Let us know about a pregnancy to unlock benefits.</p>
+                    </div>
+                    <div className="ml-3 flex-shrink-0">
+                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">$10 towards diapers</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedAction('pregnancy')}
+                    className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    Report Pregnancy
+                  </button>
+                </div>
+              </div>
+
+              {/* Health Survey */}
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Take Health Survey</h3>
+                      <p className="text-sm text-gray-600">Complete a short survey to receive a reward.</p>
+                    </div>
+                    <div className="ml-3 flex-shrink-0">
+                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">$20 gym card</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedAction('health-survey')}
+                    className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    Start Survey
+                  </button>
+                </div>
+              </div>
+              </>
+              )}
+
+              {/* Health Visits tab */}
+              {actionFilter === 'visits' && (
+              <>
+                <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">Annual Health Risk Assessment</h3>
+                        <p className="text-sm text-gray-600">Complete your yearly assessment to identify risks and earn rewards.</p>
+                      </div>
+                      <div className="ml-3 flex-shrink-0">
+                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">$20</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedAction('health-assessment')}
+                      className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                    >
+                      Start Assessment
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:border-purple-400 transition-colors">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">Schedule with your PCP</h3>
+                        <p className="text-sm text-gray-600">Book and complete an annual checkup with your primary care physician.</p>
+                      </div>
+                      <div className="ml-3 flex-shrink-0">
+                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">$50</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedAction('pcp-appointment')}
+                      className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                    >
+                      Schedule Appointment
+                    </button>
+                  </div>
+                </div>
+              </>
+              )}
               </>
             ) : (
               <>
@@ -966,50 +1011,52 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
             </div>
           </div>
         ) : currentView === 'program' ? (
-          /* My Program Page */
+          /* My Program Page (CareSource Plan Information style) */
           <div className="flex-1 px-6 py-6 overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">My Program</h2>
-            <div className="bg-white rounded-xl p-6 shadow-md mb-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Program Information</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                Welcome to your benefits program. This section provides information about your program eligibility, benefits, and usage guidelines.
-              </p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Plan Information</h2>
+
+            {/* Hero */}
+            <div className="bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-2xl p-5 shadow-sm mb-5">
+              <h3 className="text-lg font-bold mb-1">CareSource Medicaid</h3>
+              <p className="text-sm opacity-90">Cover what matters with extra benefits, rewards and tools for your family.</p>
             </div>
 
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-4">
-              <h3 className="text-lg font-bold text-blue-900 mb-2">Program Details</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Access to multiple benefit programs</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Easy redemption at participating retailers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Real-time balance tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Secure digital payment processing</span>
-                </li>
-              </ul>
+            {/* Tiles */}
+            <div className="grid grid-cols-1 gap-4 mb-5">
+              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Rewards</h4>
+                <p className="text-sm text-gray-600 mb-3">Get rewarded for healthy actions like vaccines, health surveys and checkups. Redeem instantly.</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-semibold">Immediate rewards</span>
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-semibold">Gift cards</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-semibold">Online shopping</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Benefits & Services</h4>
+                <p className="text-sm text-gray-600 mb-3">Extra benefits beyond medical care, including dental, vision, pregnancy support and programs for moms & kids.</p>
+                <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                  <li>Diaper Reward and Grocery Card incentives</li>
+                  <li>Dental, vision and pharmacy coverage</li>
+                  <li>CareSource Life Services and job help</li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Tools & Resources</h4>
+                <p className="text-sm text-gray-600">Find a doctor, view prescriptions and manage your plan with CareSource MyLife.</p>
+              </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6">
-              <p className="text-xs text-gray-500 text-center">
-                This page is customizable by your program administrator. Contact your HR department for more information about your specific benefits.
-              </p>
+            {/* How to Enroll */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <h4 className="text-sm font-bold text-gray-900 mb-3">How to Enroll</h4>
+              <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
+                <li>Apply via Georgia Gateway to check Medicaid or PeachCare for Kids eligibility.</li>
+                <li>Call 1-855-202-0729 (TTY: 1-800-255-0056 or 711) to learn about CareSource benefits.</li>
+                <li>Enroll in Georgia Families and choose CareSource as your health plan.</li>
+              </ol>
             </div>
           </div>
         ) : currentView === 'help' ? (
@@ -1151,7 +1198,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
 
         {/* Store Dropdown */}
         {showStoreDropdown && (
-          <div className="absolute inset-0 bg-black/50 z-30" onClick={() => setShowStoreDropdown(false)}>
+            <div className="absolute inset-0 bg-black/40 z-30" onClick={() => setShowStoreDropdown(false)}>
             <div
               className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 transform transition-transform duration-300 max-h-[70vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
@@ -1184,7 +1231,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
           <>
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-black/50 z-40 transition-opacity duration-300"
+              className="absolute inset-0 bg-black/40 z-40 transition-opacity duration-300"
               onClick={() => setShowInstructions(false)}
             />
 
@@ -1361,7 +1408,7 @@ export default function WalletView({ onStepChange }: WalletViewProps) {
           <>
             {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-black/50 z-40 transition-opacity duration-300"
+              className="absolute inset-0 bg-black/40 z-40 transition-opacity duration-300"
               onClick={() => setSelectedAction(null)}
             />
 

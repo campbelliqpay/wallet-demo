@@ -11,7 +11,7 @@ export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+    <div className="absolute inset-0 bg-black z-50 flex flex-col">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 flex items-center justify-between">
         <button
