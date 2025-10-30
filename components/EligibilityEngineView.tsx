@@ -17,7 +17,6 @@ export default function EligibilityEngineView({ onStepChange }: EligibilityEngin
   const [dobMonth, setDobMonth] = useState('');
   const [dobDay, setDobDay] = useState('');
   const [dobYear, setDobYear] = useState('');
-  const [program, setProgram] = useState('OTC Network');
 
   const [immunizationType, setImmunizationType] = useState('Influenza');
   const [immunizationDate, setImmunizationDate] = useState('');
@@ -275,15 +274,7 @@ export default function EligibilityEngineView({ onStepChange }: EligibilityEngin
                             <input value={dobYear} onChange={(e) => setDobYear(e.target.value)} className="w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="1985" />
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Program</label>
-                          <select value={program} onChange={(e) => setProgram(e.target.value)} className="w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            <option>OTC Network</option>
-                            <option>Transportation</option>
-                            <option>Healthy Foods</option>
-                          </select>
-                        </div>
-                        <button onClick={() => setStep(2)} className="mt-1 inline-flex items-center justify-center rounded-lg bg-blue-600 text-white font-semibold py-2.5 px-4 hover:bg-blue-700 transition">
+                        <button onClick={() => setStep(2)} className="mt-3 inline-flex items-center justify-center rounded-lg bg-blue-600 text-white font-semibold py-2.5 px-4 hover:bg-blue-700 transition">
                           Verify Eligibility
                         </button>
                       </div>
@@ -349,10 +340,6 @@ export default function EligibilityEngineView({ onStepChange }: EligibilityEngin
                           <div>
                             <div className="text-gray-500">DOB</div>
                             <div className="font-semibold text-gray-900">{[dobMonth, dobDay, dobYear].filter(Boolean).join('/') || '—'}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-500">Program</div>
-                            <div className="font-semibold text-gray-900">{program}</div>
                           </div>
                           <div>
                             <div className="text-gray-500">Type</div>

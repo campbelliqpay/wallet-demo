@@ -73,7 +73,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {showSuccess ? (
           // Success Screen
           <div className="p-8 text-center">
@@ -88,11 +88,11 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
         ) : (
           <>
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 flex items-center justify-between rounded-t-2xl">
-              <h2 className="text-lg font-bold">Report Missing Product</h2>
+            <div className="relative p-6 pb-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 pr-8">Report Missing Product</h2>
               <button
                 onClick={handleClose}
-                className="p-1 hover:bg-white/20 rounded-full transition"
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -101,16 +101,16 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
             </div>
 
             {/* Form Content */}
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-4">
               {/* Select Store */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Select Store
                 </label>
                 <select
                   value={selectedStore}
                   onChange={(e) => setSelectedStore(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-gray-900 bg-white"
                 >
                   <option value="">Choose a store...</option>
                   {stores.map((store) => (
@@ -123,13 +123,13 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
 
               {/* Select Type of Report */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Select Type of Report
                 </label>
                 <select
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-gray-900 bg-white"
                 >
                   <option value="">Choose report type...</option>
                   {reportTypes.map((type) => (
@@ -142,7 +142,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
 
               {/* Upload Photo */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Identify Product - Upload Photo
                 </label>
 
@@ -152,7 +152,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
                     <img
                       src={uploadedPhoto}
                       alt="Uploaded product"
-                      className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
+                      className="w-full h-48 object-cover rounded-xl border border-gray-300"
                     />
                     <button
                       onClick={() => setUploadedPhoto(null)}
@@ -182,7 +182,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
                           fileInputRef.current.click();
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-50 border-2 border-blue-300 rounded-lg hover:bg-blue-100 transition text-blue-700 font-medium"
+                      className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition text-blue-600 font-medium"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -194,7 +194,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
                     {/* Select from Phone Button */}
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition text-gray-700 font-medium"
+                      className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition text-gray-700 font-medium"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -207,10 +207,10 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
             </div>
 
             {/* Submit Button */}
-            <div className="p-6 pt-0">
+            <div className="px-6 pb-6">
               <button
                 onClick={handleSubmit}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-4 rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-600 transition shadow-lg"
+                className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-base hover:bg-blue-700 transition"
               >
                 Submit Report
               </button>
