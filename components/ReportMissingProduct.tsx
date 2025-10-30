@@ -72,7 +72,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {showSuccess ? (
           // Success Screen
