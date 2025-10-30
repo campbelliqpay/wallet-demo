@@ -9,6 +9,7 @@ interface ReportMissingProductProps {
 
 export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingProductProps) {
   const [selectedStore, setSelectedStore] = useState('');
+  const [selectedCatalog, setSelectedCatalog] = useState('');
   const [reportType, setReportType] = useState('');
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -23,6 +24,13 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
     'Safeway',
     'Whole Foods',
     'Other'
+  ];
+
+  const catalogs = [
+    'OTC Network',
+    'Healthy Foods',
+    'Transportation',
+    'Home & Community'
   ];
 
   const reportTypes = [
@@ -43,7 +51,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
 
   const handleSubmit = () => {
     // Validate all fields are filled
-    if (!selectedStore || !reportType || !uploadedPhoto) {
+    if (!selectedStore || !selectedCatalog || !reportType || !uploadedPhoto) {
       alert('Please fill in all fields before submitting');
       return;
     }
@@ -55,6 +63,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
     setTimeout(() => {
       setShowSuccess(false);
       setSelectedStore('');
+      setSelectedCatalog('');
       setReportType('');
       setUploadedPhoto(null);
       onClose();
@@ -63,6 +72,7 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
 
   const handleClose = () => {
     setSelectedStore('');
+    setSelectedCatalog('');
     setReportType('');
     setUploadedPhoto(null);
     setShowSuccess(false);
@@ -72,8 +82,12 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/30 z-[60]" onClick={handleClose} />
+
+      {/* Modal sliding from bottom */}
+      <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl border-t border-gray-200 z-[61] max-h-[85vh] overflow-y-auto">
         {showSuccess ? (
           // Success Screen
           <div className="p-8 text-center">
@@ -116,6 +130,25 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
                   {stores.map((store) => (
                     <option key={store} value={store}>
                       {store}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Select Catalog */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Select Catalog
+                </label>
+                <select
+                  value={selectedCatalog}
+                  onChange={(e) => setSelectedCatalog(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-gray-900 bg-white"
+                >
+                  <option value="">Choose a catalog...</option>
+                  {catalogs.map((catalog) => (
+                    <option key={catalog} value={catalog}>
+                      {catalog}
                     </option>
                   ))}
                 </select>
@@ -218,6 +251,6 @@ export default function ReportMissingProduct({ isOpen, onClose }: ReportMissingP
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }
